@@ -22,15 +22,15 @@ class JwtHelper {
     }
   }
 
-  static generateAccessToken(userId, userRole) {
-    return jwt.sign({ id: userId, role: userRole }, PRODUCTION_SECRET_KEY, {
+  static generateAccessToken(user) {
+    return jwt.sign({ id: user.id, role: user.role }, PRODUCTION_SECRET_KEY, {
       expiresIn: "15min",
     });
   }
 
-  static generateRefreshToken(userId, userRole) {
+  static generateRefreshToken(user) {
     return jwt.sign(
-      { id: userId, role: userRole },
+      { id: user.id, role: user.role },
       PRODUCTION_REFRESH_SECRET_KEY,
       {
         expiresIn: "7days",

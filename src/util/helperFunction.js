@@ -18,6 +18,10 @@ class HelperFunction {
       Logger.error("idValidation", err);
     }
   }
+
+  static async comparePassword(oldPassword, newPassword) {
+    return await bcrypt.compare(oldPassword, newPassword);
+  }
 }
 
 export default HelperFunction;
