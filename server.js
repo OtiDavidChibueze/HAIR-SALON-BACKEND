@@ -6,11 +6,14 @@ import { Logger } from "./src/config/logger.js";
 import { apiLimiter } from "./src/config/rateLimit.js";
 import mongoose from "mongoose";
 import helmet from "helmet";
+import cookieParser from "cookie-parser";
+import UserRoutes from "./src/routes/userRoutes.js";
 
 app.use(express.json());
 app.use(cors());
 app.use(apiLimiter);
 app.use(helmet());
+app.use(cookieParser());
 
 app.get("/", (req, res) => {
   res.send("Hello World!");
@@ -32,3 +35,5 @@ const connectDB = async () => {
 };
 
 connectDB();
+
+app.use("/api/v1/user", UserRoutes);

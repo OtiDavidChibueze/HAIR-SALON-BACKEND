@@ -17,7 +17,7 @@ export const Logger = createLogger({
       format: format.combine(
         format.colorize(),
         format.printf(({ timestamp, level, message }) => {
-          return `[${timestamp} ${level}: ${message}] `;
+          return `[${timestamp} ${level}: ${message} `;
         })
       ),
     }),
