@@ -7,18 +7,6 @@ const userSchema = mongoose.Schema(
       publicId: String,
     },
 
-    coverPic: {
-      url: String,
-      publicId: String,
-    },
-
-    album: [
-      {
-        url: String,
-        publicId: String,
-      },
-    ],
-
     name: {
       type: String,
       required: true,
