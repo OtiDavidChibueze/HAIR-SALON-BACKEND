@@ -1,7 +1,7 @@
 import bcrypt from "bcrypt";
-import ResponseHelper from "./responseHelper";
+import ResponseHelper from "./responseHelper.js";
 import mongoose from "mongoose";
-import { Logger } from "../config/logger";
+import { Logger } from "../config/logger.js";
 
 class HelperFunction {
   static async hashPassword(newPassword) {
