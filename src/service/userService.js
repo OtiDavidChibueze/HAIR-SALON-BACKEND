@@ -85,13 +85,39 @@ class UserService {
 
     const verificationToken = JwtHelper.generateVerificationToken(user);
 
-    const verificationLink = `<p>Click <a href="${PRODUCTION_BASE_URL}/verify-email/token=${verificationToken}"> here </a> to verify your email</p>`;
-
     const mailOption = {
       from: PRODUCTION_EMAIL_ADDRESS,
       to: user.email,
-      subject: "Email Verification",
-      html: verificationLink,
+      subject: "Account Verification",
+      html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  line-height: 1.6;
+                }
+                a {
+                  color: #007BFF;
+                  text-decoration: none;
+                }
+                a:hover {
+                  text-decoration: underline;
+                }
+              </style>
+            </head>
+            <body>
+              <p>Please click the link below to verify your account:</p>
+              <p>
+                <a href="${PRODUCTION_BASE_URL}/verify-email?token=${verificationToken}">
+                  Verify Your Account
+                </a>
+              </p>
+              <p>If you didn’t request this, you can safely ignore this email.</p>
+            </body>
+          </html>
+        `,
     };
 
     await transporter.sendMail(mailOption);
