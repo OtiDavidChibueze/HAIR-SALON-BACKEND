@@ -21,4 +21,6 @@ route.post(
   UserController.createUser
 );
 
+route.get("/verify-email", UserController.verifyAccount);
+
 export default route;

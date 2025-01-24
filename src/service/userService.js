@@ -7,6 +7,7 @@ import {
   PRODUCTION_BASE_URL,
 } from "../config/keys.js";
 import transporter from "../config/nodemailer.js";
+import redisClient from "../config/redis.js";
 
 class UserService {
   static async login(res, { email, password }) {
@@ -126,7 +127,60 @@ class UserService {
       statusCode: 200,
       message:
         "Account created, and a verification mail has been sent to your email !",
-      data: { user },
+      data: { user, verificationToken },
+    };
+  }
+
+  static async verifyAccount(token) {
+    if (!token)
+      return {
+        statusCode: 404,
+        message: "No token found",
+      };
+
+    let tokenBlacklisted;
+
+    try {
+      tokenBlacklisted = await redisClient.get(`blacklist:${token}`);
+    } catch (err) {
+      return Logger.error("Redis Error:", err);
+    }
+
+    if (tokenBlacklisted)
+      return {
+        statusCode: 403,
+        message: "Token has already been revoked",
+      };
+
+    const decode = JwtHelper.decodeAccessToken(token);
+
+    if (!decode)
+      return {
+        statusCode: 400,
+        message: "Invalid token or token expired",
+      };
+
+    const user = await UserModel.findById(decode.id);
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User does not exist",
+      };
+
+    if (user.isVerified === true)
+      return {
+        statusCode: 406,
+        message: "Account has already been verified",
+      };
+
+    user.isVerified = true;
+    await user.save();
+
+    return {
+      statusCode: 200,
+      message: "Account has been verified, you can now login!",
+      data: { isVerified: user.isVerified },
     };
   }
 }

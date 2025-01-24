@@ -52,6 +52,36 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }
+
+  static async verifyAccount(req, res) {
+    try {
+      const result = await UserService.verifyAccount(req.query.token);
+
+      if (
+        result.statusCode === 400 ||
+        result.statusCode === 403 ||
+        result.statusCode === 404 ||
+        result.statusCode === 406
+      )
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`verifyAccountController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("verifyAccountController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
 }
 
 export default UserController;
