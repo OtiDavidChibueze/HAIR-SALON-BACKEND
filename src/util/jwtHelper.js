@@ -37,6 +37,12 @@ class JwtHelper {
       }
     );
   }
+
+  static generateVerificationToken(user) {
+    return jwt.sign({ id: user.id, role: user.role }, PRODUCTION_SECRET_KEY, {
+      expiresIn: "1h",
+    });
+  }
 }
 
 export default JwtHelper;

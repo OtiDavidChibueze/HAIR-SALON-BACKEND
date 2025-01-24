@@ -27,6 +27,31 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }
+
+  static async createUser(req, res) {
+    try {
+      const result = await UserService.createUser(req.body);
+
+      if (result.statusCode === 422 || result.statusCode === 406)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`createUserController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("createUserController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
 }
 
 export default UserController;

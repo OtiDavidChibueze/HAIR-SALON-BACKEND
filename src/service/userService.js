@@ -1,8 +1,12 @@
 import { Logger } from "../config/logger.js";
-import ResponseHelper from "../util/responseHelper.js";
 import JwtHelper from "../util/jwtHelper.js";
 import HelperFunction from "../util/helperFunction.js";
 import UserModel from "../model/userModel.js";
+import {
+  PRODUCTION_EMAIL_ADDRESS,
+  PRODUCTION_BASE_URL,
+} from "../config/keys.js";
+import transporter from "../config/nodemailer.js";
 
 class UserService {
   static async login(res, { email, password }) {
@@ -53,6 +57,50 @@ class UserService {
       statusCode: 200,
       message: "log in successful",
       data: { user: getUser.name, refreshToken, accessToken },
+    };
+  }
+
+  static async createUser(data) {
+    if (!data)
+      return {
+        statusCode: 422,
+        message: "Provide inputs for fields",
+      };
+
+    const userExists = await UserModel.findOne({ email: data.email });
+
+    if (userExists)
+      return {
+        statusCode: 406,
+        message: "User already have an existing account",
+      };
+
+    const hashPassword = await HelperFunction.hashPassword(data.password);
+
+    const user = await new UserModel(data);
+
+    user.password = hashPassword;
+
+    await user.save();
+
+    const verificationToken = JwtHelper.generateVerificationToken(user);
+
+    const verificationLink = `<p>Click <a href="${PRODUCTION_BASE_URL}/verify-email/token=${verificationToken}"> here </a> to verify your email</p>`;
+
+    const mailOption = {
+      from: PRODUCTION_EMAIL_ADDRESS,
+      to: user.email,
+      subject: "Email Verification",
+      html: verificationLink,
+    };
+
+    await transporter.sendMail(mailOption);
+
+    return {
+      statusCode: 200,
+      message:
+        "Account created, and a verification mail has been sent to your email !",
+      data: { user },
     };
   }
 }

@@ -58,11 +58,14 @@ const createUser = Joi.object({
     }),
 
   createdAt: Joi.date()
-    .optional()
     .default(() => new Date())
     .messages({
       "date.base": "Created At must be a valid date.",
     }),
+
+  isVerified: Joi.boolean().default(false).messages({
+    "boolean.base": "Is verified must be a boolean.",
+  }),
 }).unknown(true); // Allows unknown properties (like timestamps) to pass through
 
 const login = Joi.object({
