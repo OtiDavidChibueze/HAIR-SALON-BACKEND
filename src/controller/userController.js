@@ -82,6 +82,33 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }
+
+  static async forgottenPassword(req, res) {
+    try {
+      const result = await UserService.forgottenPassword(req.body);
+
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(
+        `forgottenPasswordController: ${JSON.stringify(result.data)}`
+      );
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("forgottenPasswordController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
 }
 
 export default UserController;
