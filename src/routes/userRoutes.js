@@ -10,9 +10,11 @@ import {
   login,
   resetPassword,
 } from "../validation/schema/userSchemaValidation.js";
+import { loginLimiter } from "../config/rateLimit.js";
 
 route.post(
   "/login",
+  loginLimiter,
   SchemaValidationHelper.validateInput(login),
   UserController.login
 );
@@ -28,11 +30,11 @@ route.get(
   SchemaValidationHelper.validateInput(resetPassword),
   UserController.resetPassword
 );
-
 route.get(
   "/forgotten-password",
   SchemaValidationHelper.validateInput(forgottenPassword),
   UserController.forgottenPassword
 );
+route.get("/profile", JwtAuth, UserController.profile);
 
 export default route;
