@@ -90,4 +90,20 @@ const login = Joi.object({
   }),
 });
 
-export { createUser, login };
+const forgottenPassword = Joi.object({
+  email: Joi.string()
+    .email()
+    .pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)
+    .required()
+    .trim()
+    .messages({
+      "string.base": "Email must be a string.",
+      "string.empty": "Email is required.",
+      "string.email": "Email must be a valid email address.",
+      "string.pattern.base":
+        "Email format is invalid. Ensure it follows 'example@domain.com'.",
+      "any.required": "Email is required.",
+    }),
+});
+
+export { createUser, login, forgottenPassword };
