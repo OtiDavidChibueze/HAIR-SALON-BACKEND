@@ -6,6 +6,7 @@ import UserController from "../controller/userController.js";
 import SchemaValidationHelper from "../util/schemaValidationHelper.js";
 import {
   createUser,
+  forgottenPassword,
   login,
 } from "../validation/schema/userSchemaValidation.js";
 
@@ -22,5 +23,10 @@ route.post(
 );
 
 route.get("/verify-email", UserController.verifyAccount);
+route.get(
+  "/forgotten-password",
+  SchemaValidationHelper.validateInput(forgottenPassword),
+  UserController.forgottenPassword
+);
 
 export default route;
