@@ -7,7 +7,11 @@ class UserController {
     try {
       const result = await UserService.login(res, req.body);
 
-      if (result.statusCode === 422 || result.statusCode === 404)
+      if (
+        result.statusCode === 422 ||
+        result.statusCode === 404 ||
+        result.statusCode === 406
+      )
         return ResponseHelper.errorResponse(
           res,
           result.statusCode,
@@ -23,7 +27,7 @@ class UserController {
         result.data
       );
     } catch (err) {
-      Logger.error("loginController Error:", err.message);
+      Logger.error("loginController Error:", err);
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }
@@ -137,6 +141,31 @@ class UserController {
     } catch (err) {
       Logger.error("resetPasswordController Error:", err);
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
+
+  static async profile(req, res) {
+    try {
+      const result = await UserService.profile(req.user);
+
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`profileController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("profileController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
     }
   }
 }

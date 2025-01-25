@@ -8,7 +8,6 @@ import {
 } from "../config/keys.js";
 import transporter from "../config/nodemailer.js";
 import redisClient from "../config/redis.js";
-import { loggers } from "winston";
 
 class UserService {
   static async login(res, { email, password }) {
@@ -25,6 +24,52 @@ class UserService {
         statusCode: 404,
         message: "Invalid email/password",
       };
+
+    if (getUser.isVerified == false) {
+      const verificationToken = JwtHelper.generateVerificationToken(getUser);
+
+      const mailOption = {
+        from: PRODUCTION_EMAIL_ADDRESS,
+        to: getUser.email,
+        subject: "Account Verification",
+        html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  line-height: 1.6;
+                }
+                a {
+                  color: #007BFF;
+                  text-decoration: none;
+                }
+                a:hover {
+                  text-decoration: underline;
+                }
+              </style>
+            </head>
+            <body>
+              <p>Please click the link below to verify your account:</p>
+              <p>
+                <a href="${PRODUCTION_BASE_URL}/verify-email?token=${verificationToken}">
+                  Verify Your Account
+                </a>
+              </p>
+              <p>If you didn’t request this, you can safely ignore this email.</p>
+            </body>
+          </html>
+        `,
+      };
+
+      await transporter.sendMail(mailOption);
+
+      return {
+        statusCode: 406,
+        message: "Please verify account before attempting login!",
+      };
+    }
 
     const comparePassword = HelperFunction.comparePassword(
       getUser.password,
@@ -304,6 +349,22 @@ class UserService {
       statusCode: 200,
       message: "Account password has been reset, you can now login!",
       data: { user: user.email },
+    };
+  }
+
+  static async profile({ id }) {
+    const user = await UserModel.findById(id, { password: 0 });
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User not found",
+      };
+
+    return {
+      statusCode: 200,
+      message: "Profile fetched!",
+      data: { user },
     };
   }
 }
