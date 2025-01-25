@@ -106,4 +106,43 @@ const forgottenPassword = Joi.object({
     }),
 });
 
-export { createUser, login, forgottenPassword };
+const resetPassword = Joi.object({
+  newPassword: Joi.string()
+    .min(8)
+    .max(128)
+    .pattern(
+      new RegExp(
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$"
+      )
+    )
+    .required()
+    .messages({
+      "string.base": "Password must be a string.",
+      "string.empty": "Password is required.",
+      "string.min": "Password must be at least 8 characters long.",
+      "string.max": "Password cannot exceed 128 characters.",
+      "string.pattern.base":
+        "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+      "any.required": "Password is required.",
+    }),
+  comfirmPassword: Joi.string()
+    .min(8)
+    .max(128)
+    .pattern(
+      new RegExp(
+        "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&#])[A-Za-z\\d@$!%*?&#]{8,}$"
+      )
+    )
+    .required()
+    .messages({
+      "string.base": "Password must be a string.",
+      "string.empty": "Password is required.",
+      "string.min": "Password must be at least 8 characters long.",
+      "string.max": "Password cannot exceed 128 characters.",
+      "string.pattern.base":
+        "Password must include at least one uppercase letter, one lowercase letter, one number, and one special character.",
+      "any.required": "Password is required.",
+    }),
+});
+
+export { createUser, login, forgottenPassword, resetPassword };
