@@ -4,8 +4,7 @@ import redisClient from "../config/redis.js";
 import JwtHelper from "../util/jwtHelper.js";
 
 const JwtAuth = async (req, res, next) => {
-  const token =
-    req.cookies.accessToken || req.headers.authorization?.split(" ")[1];
+  const token = req.cookies.accessToken || req.cookies.refreshToken;
 
   if (!token) return ResponseHelper.errorResponse(res, 404, "No token found");
 
