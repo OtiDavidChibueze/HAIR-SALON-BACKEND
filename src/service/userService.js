@@ -245,6 +245,67 @@ class UserService {
       data: { user: getUser.email, resetToken },
     };
   }
+
+  static async resetPassword(token, { newPassword, comfirmPassword }) {
+    if (!token)
+      return {
+        statusCode: 404,
+        message: "No token found",
+      };
+
+    if (!newPassword && !comfirmPassword)
+      return {
+        statusCode: 404,
+        message: "Provide new password and comfrim password input!",
+      };
+
+    let tokenBlacklisted;
+
+    try {
+      tokenBlacklisted = await redisClient.get(`blacklist:${token}`);
+    } catch (err) {
+      return Logger.error("Redis Error:", err);
+    }
+
+    if (tokenBlacklisted)
+      return {
+        statusCode: 403,
+        message: "Token has already been revoked",
+      };
+
+    const decode = JwtHelper.decodeAccessToken(token);
+
+    if (!decode)
+      return {
+        statusCode: 400,
+        message: "Invalid token or token expired",
+      };
+
+    const user = await UserModel.findById(decode.id);
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User does not exist",
+      };
+
+    if (newPassword !== comfirmPassword)
+      return {
+        statusCode: 406,
+        message: "passwords isnt matched, please check your inputs",
+      };
+
+    const hashPassword = await HelperFunction.hashPassword(comfirmPassword);
+
+    user.password = hashPassword;
+    await user.save();
+
+    return {
+      statusCode: 200,
+      message: "Account password has been reset, you can now login!",
+      data: { user: user.email },
+    };
+  }
 }
 
 export default UserService;

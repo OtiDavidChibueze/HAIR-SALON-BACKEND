@@ -8,6 +8,7 @@ import {
   createUser,
   forgottenPassword,
   login,
+  resetPassword,
 } from "../validation/schema/userSchemaValidation.js";
 
 route.post(
@@ -15,7 +16,6 @@ route.post(
   SchemaValidationHelper.validateInput(login),
   UserController.login
 );
-
 route.post(
   "/createUser",
   SchemaValidationHelper.validateInput(createUser),
@@ -23,6 +23,12 @@ route.post(
 );
 
 route.get("/verify-email", UserController.verifyAccount);
+route.get(
+  "/reset-password",
+  SchemaValidationHelper.validateInput(resetPassword),
+  UserController.resetPassword
+);
+
 route.get(
   "/forgotten-password",
   SchemaValidationHelper.validateInput(forgottenPassword),
