@@ -8,6 +8,7 @@ import {
 } from "../config/keys.js";
 import transporter from "../config/nodemailer.js";
 import redisClient from "../config/redis.js";
+import { loggers } from "winston";
 
 class UserService {
   static async login(res, { email, password }) {
@@ -181,6 +182,67 @@ class UserService {
       statusCode: 200,
       message: "Account has been verified, you can now login!",
       data: { isVerified: user.isVerified },
+    };
+  }
+
+  static async forgottenPassword({ email }) {
+    if (!email)
+      return {
+        statusCode: 404,
+        message: "Provide an email field",
+      };
+
+    const getUser = await UserModel.findOne({ email });
+
+    if (!getUser)
+      return {
+        statusCode: 404,
+        message: "User with the provided email not found",
+      };
+
+    const resetToken = JwtHelper.generateVerificationToken(getUser);
+
+    const mailOption = {
+      from: PRODUCTION_EMAIL_ADDRESS,
+      to: getUser.email,
+      subject: "Password Reset",
+      html: `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <style>
+                  body {
+                    font-family: Arial, sans-serif;
+                    line-height: 1.6;
+                  }
+                  a {
+                    color: #007BFF;
+                    text-decoration: none;
+                  }
+                  a:hover {
+                    text-decoration: underline;
+                  }
+                </style>
+              </head>
+              <body>
+                <p>Please click the link below to reset your account password:</p>
+                <p>
+                  <a href="${PRODUCTION_BASE_URL}/reset-password?token=${resetToken}">
+                    Verify Your Account
+                  </a>
+                </p>
+                <p>If you didn’t request this, you can safely ignore this email.</p>
+              </body>
+            </html>
+          `,
+    };
+
+    await transporter.sendMail(mailOption);
+
+    return {
+      statusCode: 200,
+      message: "A password reset link has been sent to your provided email!",
+      data: { user: getUser.email, resetToken },
     };
   }
 }
