@@ -367,6 +367,51 @@ class UserService {
       data: { user },
     };
   }
+
+  static async logOut(res, { refreshToken, accessToken }) {
+    if (!refreshToken)
+      return {
+        statusCode: 400,
+        message: "No tokens provided for log out",
+      };
+
+    const decode = JwtHelper.decodeRefreshToken(refreshToken);
+
+    if (!decode)
+      return {
+        statusCode: 403,
+        message: "Invalid or expired token",
+      };
+
+    await redisClient.setEx(
+      `blacklist:${accessToken}`,
+      15 * 60 * 1000,
+      decode.id
+    );
+    await redisClient.setEx(
+      `blacklist:${refreshToken}`,
+      7 * 24 * 24 * 60 * 1000,
+      decode.id
+    );
+
+    res.clearCookie("accessToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "strict",
+    });
+
+    return {
+      statusCode: 200,
+      message: "user logged out",
+      data: { userId: decode.id },
+    };
+  }
 }
 
 export default UserService;

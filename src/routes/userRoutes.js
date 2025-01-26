@@ -36,5 +36,6 @@ route.get(
   UserController.forgottenPassword
 );
 route.get("/profile", JwtAuth, UserController.profile);
+route.get("/logOut", JwtAuth, UserController.logOut);
 
 export default route;

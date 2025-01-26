@@ -168,6 +168,31 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "Internal server error");
     }
   }
+
+  static async logOut(req, res) {
+    try {
+      const result = await UserService.logOut(res, req.cookies);
+
+      if (result.statusCode === 400 || result.statusCode === 403)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`logOutController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("logOutController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
 }
 
 export default UserController;
