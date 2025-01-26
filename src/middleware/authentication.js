@@ -24,12 +24,17 @@ const JwtAuth = async (req, res, next) => {
       "Token has been revoked. Please login again"
     );
 
-  const decodeToken = JwtHelper.decodeAccessToken(token);
+  const decode = req.cookies.accessToken
+    ? JwtHelper.decodeAccessToken(req.cookies.accessToken)
+    : req.cookies.refreshToken
+    ? JwtHelper.decodeRefreshToken(req.cookies.refreshToken)
+    : null;
 
-  if (!decodeToken)
+  if (!decode) {
     return ResponseHelper.errorResponse(res, 403, "Invalid or expired token!!");
+  }
 
-  req.user = decodeToken;
+  req.user = decode;
 
   next();
 };
