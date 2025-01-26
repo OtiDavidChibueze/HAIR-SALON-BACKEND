@@ -23,19 +23,6 @@ class HelperFunction {
   static async comparePassword(newPassword, oldPassword) {
     return await bcrypt.compare(newPassword, oldPassword);
   }
-
-  // static async isTokenBlacklisted(token, type) {
-  //   let tokenBlacklisted;
-
-  //   try {
-  //     tokenBlacklisted = await redisClient.get(`blacklist:${token}`);
-  //   } catch (err) {
-  //     return Logger.error("isTokenBlacklisted Error:", err);
-  //   }
-
-  //   if (tokenBlacklisted)
-  //     return ResponseHelper.errorResponse(res, 400, "Token has been revoked!");
-  // }
 }
 
 export default HelperFunction;
