@@ -313,6 +313,8 @@ class UserService {
   }
 
   static async profile({ id }) {
+    HelperFunction.IdValidation(id);
+
     const user = await UserModel.findById(id, { password: 0 });
 
     if (!user)
