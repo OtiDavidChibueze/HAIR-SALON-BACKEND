@@ -83,22 +83,10 @@ class UserService {
       };
 
     const accessToken = JwtHelper.generateAccessToken(getUser);
-
     const refreshToken = JwtHelper.generateRefreshToken(getUser);
 
-    res.cookie("accessToken", accessToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 15 * 60 * 1000,
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: true,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    HelperFunction.accessTokenCookie(res, accessToken);
+    HelperFunction.refreshTokenCookie(res, refreshToken);
 
     return {
       statusCode: 200,
@@ -182,20 +170,6 @@ class UserService {
       return {
         statusCode: 404,
         message: "No token found",
-      };
-
-    let tokenBlacklisted;
-
-    try {
-      tokenBlacklisted = await redisClient.get(`blacklist:${token}`);
-    } catch (err) {
-      return Logger.error("Redis Error:", err);
-    }
-
-    if (tokenBlacklisted)
-      return {
-        statusCode: 403,
-        message: "Token has already been revoked",
       };
 
     const decode = JwtHelper.decodeAccessToken(token);
@@ -302,20 +276,6 @@ class UserService {
       return {
         statusCode: 404,
         message: "Provide new password and comfrim password input!",
-      };
-
-    let tokenBlacklisted;
-
-    try {
-      tokenBlacklisted = await redisClient.get(`blacklist:${token}`);
-    } catch (err) {
-      return Logger.error("Redis Error:", err);
-    }
-
-    if (tokenBlacklisted)
-      return {
-        statusCode: 403,
-        message: "Token has already been revoked",
       };
 
     const decode = JwtHelper.decodeAccessToken(token);
