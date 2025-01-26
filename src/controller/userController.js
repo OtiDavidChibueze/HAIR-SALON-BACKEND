@@ -193,6 +193,31 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "Internal server error");
     }
   }
+
+  static async refreshToken(req, res) {
+    try {
+      const result = await UserService.refreshToken(res, req.cookies);
+
+      if (result.statusCode === 404 || result.statusCode === 403)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`refreshTokenController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("refreshTokenController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
 }
 
 export default UserController;

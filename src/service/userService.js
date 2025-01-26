@@ -384,7 +384,59 @@ class UserService {
     };
   }
 
-  //
+  static async refreshToken(res, { accessToken, refreshToken }) {
+    if (!accessToken || !refreshToken)
+      return {
+        statusCode: 404,
+        message: "No token found",
+      };
+
+    const decode = accessToken
+      ? JwtHelper.decodeAccessToken(accessToken)
+      : refreshToken
+      ? JwtHelper.decodeRefreshToken(refreshToken)
+      : null;
+
+    if (!decode)
+      return {
+        statusCode: 403,
+        message: "Invalid or expired token",
+      };
+
+    const user = await UserModel.findById(decode.id);
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User not found",
+      };
+
+    accessToken
+      ? await redisClient.setEx(
+          `blacklist:${accessToken}`,
+          15 * 60 * 1000,
+          decode.id
+        )
+      : refreshToken
+      ? await redisClient.setEx(
+          `blacklist:${refreshToken}`,
+          7 * 24 * 60 * 60 * 1000,
+          decode.id
+        )
+      : null;
+
+    const generateAccessToken = JwtHelper.generateAccessToken(user);
+    const generateRefreshToken = JwtHelper.generateRefreshToken(user);
+
+    HelperFunction.accessTokenCookie(res, generateAccessToken);
+    HelperFunction.refreshTokenCookie(res, generateRefreshToken);
+
+    return {
+      statusCode: 200,
+      message: "refreshed successfully",
+      data: { generateAccessToken, generateRefreshToken },
+    };
+  }
 }
 
 export default UserService;

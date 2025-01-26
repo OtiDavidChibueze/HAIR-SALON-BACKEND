@@ -37,5 +37,6 @@ route.get(
 );
 route.get("/profile", JwtAuth, UserController.profile);
 route.get("/logOut", JwtAuth, UserController.logOut);
+route.get("/refresh", JwtAuth, UserController.refreshToken);
 
 export default route;
