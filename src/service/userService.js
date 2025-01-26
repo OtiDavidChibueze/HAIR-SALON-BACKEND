@@ -337,7 +337,11 @@ class UserService {
         message: "No tokens provided for log out",
       };
 
-    const decode = JwtHelper.decodeRefreshToken(refreshToken);
+    const decode = accessToken
+      ? JwtHelper.decodeRefreshToken(refreshToken)
+      : refreshToken
+      ? JwtHelper.decodeRefreshToken(refreshToken)
+      : null;
 
     if (!decode)
       return {
@@ -345,16 +349,21 @@ class UserService {
         message: "Invalid or expired token",
       };
 
-    await redisClient.setEx(
-      `blacklist:${accessToken}`,
-      15 * 60 * 1000,
-      decode.id
-    );
-    await redisClient.setEx(
-      `blacklist:${refreshToken}`,
-      7 * 24 * 24 * 60 * 1000,
-      decode.id
-    );
+    accessToken
+      ? await redisClient.setEx(
+          `blacklist:${accessToken}`,
+          15 * 60 * 1000,
+          decode.id
+        )
+      : null;
+
+    refreshToken
+      ? await redisClient.setEx(
+          `blacklist:${refreshToken}`,
+          7 * 24 * 24 * 60 * 1000,
+          decode.id
+        )
+      : null;
 
     res.clearCookie("accessToken", {
       httpOnly: true,
@@ -374,6 +383,8 @@ class UserService {
       data: { userId: decode.id },
     };
   }
+
+  //
 }
 
 export default UserService;
