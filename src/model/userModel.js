@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const userSchema = mongoose.Schema(
   {
-    avatar: {
+    profilePic: {
       url: String,
       publicId: String,
     },
