@@ -36,5 +36,5 @@ export const Logger = createLogger({
 });
 
 process.on("unhandledRejection", (reason) => {
-  Logger.error("UnhandledRejection", reason);
+  Logger.error("UnhandledRejection:", reason);
 });
