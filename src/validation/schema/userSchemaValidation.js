@@ -2,10 +2,10 @@ import Joi from "joi";
 
 const createUser = Joi.object({
   profilePic: Joi.object({
-    url: Joi.string().uri().optional().messages({
+    url: Joi.string().uri().optional().default("").messages({
       "string.uri": "Avatar URL must be a valid URI.",
     }),
-    publicId: Joi.string().optional(),
+    publicId: Joi.string().optional().default(""),
   }).optional(),
 
   name: Joi.string().min(3).max(50).required().trim().messages({
