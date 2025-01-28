@@ -440,6 +440,8 @@ class UserService {
   }
 
   static async uploadProfilePicture({ id }, { file }) {
+    HelperFunction.IdValidation(id);
+
     if (!file)
       return {
         statusCode: 404,
