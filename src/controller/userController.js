@@ -223,6 +223,18 @@ class UserController {
     try {
       const result = await UserService.uploadProfilePicture(req.user, req);
 
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(
+        "uploadProfilePictureController:",
+        JSON.stringify(result.data)
+      );
+
       return ResponseHelper.successResponse(
         res,
         result.statusCode,
@@ -231,6 +243,31 @@ class UserController {
       );
     } catch (err) {
       console.error("uploadProfilePicController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
+
+  static async deleteProfilePic(req, res) {
+    try {
+      const result = await UserService.deleteProfilePic(req.user);
+
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info("deleteProfilePicController:", JSON.stringify(result.data));
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      console.error("deleteProfilePicController Error:", err);
       return ResponseHelper.errorResponse(res, 500, "Internal server error");
     }
   }

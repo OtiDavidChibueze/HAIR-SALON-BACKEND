@@ -475,6 +475,33 @@ class UserService {
       data: user.profilePic,
     };
   }
+
+  static async deleteProfilePic({ id }) {
+    HelperFunction.IdValidation(id);
+
+    const user = await UserModel.findById(id);
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User not found",
+      };
+
+    user.profilePic.publicId
+      ? await cloudinary.uploader.destroy(user.profilePic.publicId)
+      : null;
+
+    user.profilePic.url = "";
+    user.profilePic.publicId = "";
+
+    await user.save();
+
+    return {
+      statusCode: 200,
+      message: "profile picture deleted",
+      data: user.profilePic,
+    };
+  }
 }
 
 export default UserService;

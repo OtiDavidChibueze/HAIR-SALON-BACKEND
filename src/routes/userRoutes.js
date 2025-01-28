@@ -46,4 +46,6 @@ route.get("/profile", JwtAuth, UserController.profile);
 route.get("/logOut", JwtAuth, UserController.logOut);
 route.get("/refresh", JwtAuth, UserController.refreshToken);
 
+route.delete("/delete-profile-pic", JwtAuth, UserController.deleteProfilePic);
+
 export default route;
