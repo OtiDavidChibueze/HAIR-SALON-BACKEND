@@ -11,6 +11,7 @@ import {
   resetPassword,
 } from "../validation/schema/userSchemaValidation.js";
 import { loginLimiter } from "../config/rateLimit.js";
+import { uploadProfilePic } from "../middleware/upload.js";
 
 route.post(
   "/login",
@@ -22,6 +23,12 @@ route.post(
   "/createUser",
   SchemaValidationHelper.validateInput(createUser),
   UserController.createUser
+);
+route.post(
+  "/upload-profile-pic",
+  JwtAuth,
+  uploadProfilePic.single("image"),
+  UserController.uploadProfilePic
 );
 
 route.get("/verify-email", UserController.verifyAccount);

@@ -218,6 +218,22 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "Internal server error");
     }
   }
+
+  static async uploadProfilePic(req, res) {
+    try {
+      const result = await UserService.uploadProfilePicture(req.user, req);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      console.error("uploadProfilePicController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
 }
 
 export default UserController;

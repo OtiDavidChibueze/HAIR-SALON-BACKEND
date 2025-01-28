@@ -8,6 +8,7 @@ import {
 } from "../config/keys.js";
 import transporter from "../config/nodemailer.js";
 import redisClient from "../config/redis.js";
+import cloudinary from "../config/cloudinary.js";
 
 class UserService {
   static async login(res, { email, password }) {
@@ -435,6 +436,41 @@ class UserService {
       statusCode: 200,
       message: "refreshed successfully",
       data: { generateAccessToken, generateRefreshToken },
+    };
+  }
+
+  static async uploadProfilePicture({ id }, { file }) {
+    if (!file)
+      return {
+        statusCode: 404,
+        message: "Please select a file to upload",
+      };
+
+    const user = await UserModel.findById(id);
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User does not exist",
+      };
+
+    user.profilePic.publicId
+      ? await cloudinary.uploader.destroy(user.profilePic.publicId)
+      : null;
+
+    const result = await cloudinary.uploader.upload(file.path, {
+      folder: "profile_pictures",
+    });
+
+    user.profilePic = {
+      url: result.secure_url,
+      publicId: result.public_id,
+    };
+    await user.save();
+
+    return {
+      statusCode: 200,
+      message: "Profile picture uploaded successfully",
+      data: user.profilePic,
     };
   }
 }
