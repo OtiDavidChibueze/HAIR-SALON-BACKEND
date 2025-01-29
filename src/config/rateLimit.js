@@ -7,16 +7,24 @@ export const apiLimiter = rateLimiter({
   headers: true,
 });
 
-// Define rate-limiting rules
 export const loginLimiter = rateLimiter({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // Limit each IP to 5 login attempts per `windowMs`
+  windowMs: 15 * 60 * 1000,
+  max: 5,
   message: {
     message:
       "Too many login attempts from this IP, please try again after 15 minutes.",
   },
-  standardHeaders: true, // Return rate limit info in `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  standardHeaders: true,
+  legacyHeaders: false,
 });
 
-// Apply rate-limiting middleware to the login route
+export const appointmentLimiter = rateLimiter({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  message: {
+    message:
+      "Too many appointment from this IP, please try again after 15 minutes.",
+  },
+  standardHeaders: true,
+  legacyHeaders: false,
+});
