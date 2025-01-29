@@ -173,7 +173,21 @@ class UserService {
         message: "No token found",
       };
 
-    const decode = JwtHelper.decodeAccessToken(token);
+    let tokenBlackListed;
+
+    try {
+      tokenBlackListed = await redisClient.get(`blacklist:${token}`);
+    } catch (err) {
+      Logger.error("Redis Error:", err);
+    }
+
+    if (tokenBlackListed)
+      return {
+        statusCode: 403,
+        message: "Token has been revoked",
+      };
+
+    const decode = JwtHelper.decodeVerificationToken(token);
 
     if (!decode)
       return {
@@ -500,6 +514,107 @@ class UserService {
       statusCode: 200,
       message: "profile picture deleted",
       data: user.profilePic,
+    };
+  }
+
+  static async deleteYourAccount({ id }) {
+    HelperFunction.IdValidation(id);
+
+    const user = await UserModel.findById(id, { password: 0 });
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User not found",
+      };
+
+    const verificationToken = JwtHelper.generateVerificationToken(user);
+
+    const mailOption = {
+      from: PRODUCTION_EMAIL_ADDRESS,
+      to: user.email,
+      subject: "Delete Your Account",
+      html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  line-height: 1.6;
+                }
+                a {
+                  color: #007BFF;
+                  text-decoration: none;
+                }
+                a:hover {
+                  text-decoration: underline;
+                }
+              </style>
+            </head>
+            <body>
+              <p>Please click the link below to delete your account:</p>
+              <p>
+                <a href="${PRODUCTION_BASE_URL}/delete-account?token=${verificationToken}">
+                  Delete Your Account
+                </a>
+              </p>
+              <p>If you didn’t request this, you can safely ignore this email.</p>
+            </body>
+          </html>
+        `,
+    };
+
+    await transporter.sendMail(mailOption);
+
+    return {
+      statusCode: 200,
+      message:
+        "To permantly delete your account, comfrim via mail sent to your email!",
+      data: { user: user.email, verificationToken },
+    };
+  }
+
+  static async confirmAccountDelete({ token }) {
+    if (!token)
+      return {
+        statusCode: 404,
+        message: "No verification token found",
+      };
+
+    let tokenBlackListed;
+
+    try {
+      tokenBlackListed = await redisClient.get(`blacklist:${token}`);
+    } catch (err) {
+      Logger.error("Redis Error:", err);
+    }
+
+    if (tokenBlackListed)
+      return {
+        statusCode: 403,
+        message: "Token has been revoked",
+      };
+
+    const decode = JwtHelper.decodeVerificationToken(token);
+
+    if (!decode)
+      return {
+        statusCode: 403,
+        message: "Invalid or expired token",
+      };
+
+    const user = await UserModel.findByIdAndDelete(decode.id);
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User not found",
+      };
+
+    return {
+      statusCode: 200,
+      message: "Account successfully deleted!",
     };
   }
 }

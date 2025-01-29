@@ -32,6 +32,8 @@ route.post(
 );
 
 route.get("/verify-email", UserController.verifyAccount);
+route.get("/confirm-delete-account", UserController.confirmAccountDelete);
+
 route.get(
   "/reset-password",
   SchemaValidationHelper.validateInput(resetPassword),
@@ -47,5 +49,6 @@ route.get("/logOut", JwtAuth, UserController.logOut);
 route.get("/refresh", JwtAuth, UserController.refreshToken);
 
 route.delete("/delete-profile-pic", JwtAuth, UserController.deleteProfilePic);
+route.delete("/delete-your-account", JwtAuth, UserController.deleteYourAccount);
 
 export default route;

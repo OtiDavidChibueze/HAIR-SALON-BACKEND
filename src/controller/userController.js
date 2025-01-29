@@ -271,6 +271,58 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "Internal server error");
     }
   }
+
+  static async deleteYourAccount(req, res) {
+    try {
+      const result = await UserService.deleteYourAccount(req.user);
+
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info("deleteYourAccountController:", JSON.stringify(result.data));
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      console.error("deleteYourAccountController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
+
+  static async confirmAccountDelete(req, res) {
+    try {
+      const result = await UserService.confirmAccountDelete(req.query);
+
+      if (result.statusCode === 403 || result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(
+        `confirmAccountDeleteController: ${JSON.stringify(result.data)}`
+      );
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("confirmAccountDeletexController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
 }
 
 export default UserController;
