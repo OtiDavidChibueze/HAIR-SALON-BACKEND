@@ -112,7 +112,7 @@ class UserService {
     };
   }
 
-  static async createUser(data) {
+  static async signIn(data) {
     if (!data)
       return {
         statusCode: 422,

@@ -34,7 +34,7 @@ class UserController {
 
   static async createUser(req, res) {
     try {
-      const result = await UserService.createUser(req.body);
+      const result = await UserService.signIn(req.body);
 
       if (result.statusCode === 422 || result.statusCode === 406)
         return ResponseHelper.errorResponse(
