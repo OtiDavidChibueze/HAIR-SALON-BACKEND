@@ -9,6 +9,7 @@ import {
 import transporter from "../config/nodemailer.js";
 import redisClient from "../config/redis.js";
 import cloudinary from "../config/cloudinary.js";
+const APPNAME = "DIVINE GIFT HAIR SALON";
 
 class UserService {
   static async login(res, { email, password }) {
@@ -52,6 +53,7 @@ class UserService {
               </style>
             </head>
             <body>
+              <h1>${APPNAME}</h1>
               <p>Please click the link below to verify your account:</p>
               <p>
                 <a href="${PRODUCTION_BASE_URL}/verify-email?token=${verificationToken}">
@@ -144,6 +146,7 @@ class UserService {
               </style>
             </head>
             <body>
+              <h1>${APPNAME}</h1>
               <p>Please click the link below to verify your account:</p>
               <p>
                 <a href="${PRODUCTION_BASE_URL}/verify-email?token=${verificationToken}">
@@ -259,6 +262,7 @@ class UserService {
                 </style>
               </head>
               <body>
+                <h1>${APPNAME}</h1>
                 <p>Please click the link below to reset your account password:</p>
                 <p>
                   <a href="${PRODUCTION_BASE_URL}/reset-password?token=${resetToken}">
@@ -565,6 +569,7 @@ class UserService {
               </style>
             </head>
             <body>
+              <h1>${APPNAME}</h1>
               <p>Please click the link below to delete your account:</p>
               <p>
                 <a href="${PRODUCTION_BASE_URL}/delete-account?token=${verificationToken}">
@@ -664,6 +669,40 @@ class UserService {
     };
 
     await user.save();
+
+    const mailOption = {
+      from: PRODUCTION_EMAIL_ADDRESS,
+      to: user.email,
+      subject: "Warning On Profile Picture",
+      html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  line-height: 1.6;
+                }
+                a {
+                  color: #007BFF;
+                  text-decoration: none;
+                }
+                a:hover {
+                  text-decoration: underline;
+                }
+              </style>
+            </head>
+            <body>
+              <h1>${APPNAME}</h1>
+              <p>Hi dear ${user.name}</p>
+              <p>Your profile picture goes against our community standard and has been deleted! Please take note else your account would be permantly blocked!</p>
+              <p>Thank for your understanding :)</p>
+            </body>
+          </html>
+        `,
+    };
+
+    await transporter.sendMail(mailOption);
 
     return {
       statusCode: 200,
