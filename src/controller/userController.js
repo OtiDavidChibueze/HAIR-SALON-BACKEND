@@ -350,6 +350,31 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }
+
+  static async deleteAccountById(req, res) {
+    try {
+      const result = await UserService.deleteAccountById(req.params);
+
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`deleteUserByIdController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("deleteUserByIdController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
 }
 
 export default UserController;
