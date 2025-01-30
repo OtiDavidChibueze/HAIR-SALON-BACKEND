@@ -49,13 +49,47 @@ const createUser = Joi.object({
       "any.required": "Password is required.",
     }),
 
+  phone: Joi.string()
+    .pattern(/^(?:\+234|0)[789][01]\d{8}$/) // Nigerian phone number format
+    .required()
+    .messages({
+      "string.empty": "Phone number is required",
+      "string.pattern.base":
+        "Phone number must be a valid Nigerian number (e.g., +2348123456789 or 08123456789)",
+    }),
+
   role: Joi.string()
-    .valid("customer", "admin", "superAdmin")
-    .default("customer")
+    .valid("User", "Admin", "SuperAdmin")
+    .default("User")
     .messages({
       "string.base": "Role must be a string.",
       "any.only": "Role must be one of ['customer', 'admin', 'superAdmin'].",
     }),
+
+  address: Joi.object({
+    street: Joi.string().required().messages({
+      "string.empty": "Street is required",
+    }),
+    city: Joi.string().required().messages({
+      "string.empty": "City is required",
+    }),
+    state: Joi.string().required().messages({
+      "string.empty": "State is required",
+    }),
+    postalCode: Joi.string()
+      .pattern(/^[0-9]{5}(-[0-9]{4})?$/)
+      .min(5)
+      .max(9)
+      .required()
+      .messages({
+        "string.empty": "Postal Code is required",
+        "string.pattern.base":
+          "Postal Code must be a valid format (e.g., 12345 or 12345-6789)",
+      }),
+    country: Joi.string().required().messages({
+      "string.empty": "Country is required",
+    }),
+  }).required(),
 
   createdAt: Joi.date()
     .default(() => new Date())
@@ -65,6 +99,38 @@ const createUser = Joi.object({
 
   isVerified: Joi.boolean().default(false).messages({
     "boolean.base": "Is verified must be a boolean.",
+  }),
+
+  location: Joi.object({
+    type: Joi.string().valid("Point").required().messages({
+      "string.base": "Location type must be a string.",
+      "string.empty": "Location type is required.",
+      "any.only": 'Location type must be "Point".',
+    }),
+    coordinates: Joi.array()
+      .items(
+        Joi.number().required().messages({
+          "number.base": "Coordinates must contain numbers.",
+          "any.required": "Coordinate values are required.",
+        })
+      )
+      .length(2)
+      .required()
+      .custom((value, helpers) => {
+        const [longitude, latitude] = value;
+        if (longitude < -180 || longitude > 180) {
+          return helpers.message("Longitude must be between -180 and 180.");
+        }
+        if (latitude < -90 || latitude > 90) {
+          return helpers.message("Latitude must be between -90 and 90.");
+        }
+        return value;
+      })
+      .messages({
+        "array.base": "Coordinates must be an array of numbers.",
+        "array.length":
+          "Coordinates must contain exactly two values: [longitude, latitude].",
+      }),
   }),
 }).unknown(true); // Allows unknown properties (like timestamps) to pass through
 
