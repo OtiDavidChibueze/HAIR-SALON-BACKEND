@@ -323,6 +323,33 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }
+
+  static async deleteProfilePicByUserId(req, res) {
+    try {
+      const result = await UserService.deleteProfilePicByUserId(req.params);
+
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(
+        `deleteProfilePicByPublicIdController: ${JSON.stringify(result.data)}`
+      );
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("deleteProfilePicByPublicIdController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
 }
 
 export default UserController;
