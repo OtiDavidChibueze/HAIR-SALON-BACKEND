@@ -19,6 +19,20 @@ class UserService {
         message: "Provide email and password",
       };
 
+    let userAlreadyBlocked;
+
+    try {
+      userAlreadyBlocked = await redisClient.get(`blockedAccount:${email}`);
+    } catch (err) {
+      Logger.error("Redis Error:", err);
+    }
+
+    if (userAlreadyBlocked)
+      return {
+        statusCode: 406,
+        message: "This account has been blocked!",
+      };
+
     const getUser = await UserModel.findOne({ email });
 
     if (!getUser)
@@ -103,6 +117,20 @@ class UserService {
       return {
         statusCode: 422,
         message: "Provide inputs for fields",
+      };
+
+    let userAlreadyBlocked;
+
+    try {
+      userAlreadyBlocked = await redisClient.get(`blockedAccount:${email}`);
+    } catch (err) {
+      Logger.error("Redis Error:", err);
+    }
+
+    if (userAlreadyBlocked)
+      return {
+        statusCode: 406,
+        message: "This account has been blocked!",
       };
 
     const userExists = await UserModel.findOne({ email: data.email });
@@ -708,6 +736,77 @@ class UserService {
       statusCode: 200,
       message: "Profile picture deleted successfully",
       data: user.profilePic,
+    };
+  }
+
+  static async deleteAccountById({ id }) {
+    if (!id)
+      return {
+        statusCode: 404,
+        message: "Provide user id to delete",
+      };
+
+    HelperFunction.IdValidation(id);
+
+    const user = await UserModel.findById(id);
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User does not exist",
+      };
+
+    await UserModel.findByIdAndDelete(id);
+
+    try {
+      await redisClient.setEx(
+        `blockedAccount:${user.email}`,
+        3 * 365 * 24 * 60 * 60 * 1000,
+        user.id
+      );
+    } catch (err) {
+      Logger.error("Redis Error:", err);
+    }
+
+    const mailOption = {
+      from: PRODUCTION_EMAIL_ADDRESS,
+      to: user.email,
+      subject: "Account Deleted",
+      html: `
+          <!DOCTYPE html>
+          <html>
+            <head>
+              <style>
+                body {
+                  font-family: Arial, sans-serif;
+                  line-height: 1.6;
+                }
+                a {
+                  color: #007BFF;
+                  text-decoration: none;
+                }
+                a:hover {
+                  text-decoration: underline;
+                }
+              </style>
+            </head>
+            <body>
+              <h1>${APPNAME}</h1>
+              <p>Hi dear ${user.name}</p>
+              <p>Your account has been permantly blocked! bacause it goes against our community standard!</p>
+              <p>If you feel like we made a mistake, kindly request for a review</p>
+              <p>Thanks for your understanding:)<p/>
+            </body>
+          </html>
+        `,
+    };
+
+    await transporter.sendMail(mailOption);
+
+    return {
+      statusCode: 200,
+      message: "Account has been permantly deleted",
+      data: user.email,
     };
   }
 }
