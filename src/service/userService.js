@@ -113,7 +113,7 @@ class UserService {
 
     const hashPassword = await HelperFunction.hashPassword(data.password);
 
-    const user = await new UserModel(data);
+    const user = new UserModel(data);
 
     user.password = hashPassword;
 
@@ -456,25 +456,37 @@ class UserService {
   static async uploadProfilePicture({ id }, { file }) {
     HelperFunction.IdValidation(id);
 
-    if (!file)
+    if (!file) {
       return {
         statusCode: 404,
         message: "Please select a file to upload",
       };
+    }
 
     const user = await UserModel.findById(id);
-    if (!user)
+    if (!user) {
       return {
         statusCode: 404,
         message: "User does not exist",
       };
+    }
 
-    user.profilePic.publicId
+    user.profilePic?.publicId
       ? await cloudinary.uploader.destroy(user.profilePic.publicId)
       : null;
 
-    const result = await cloudinary.uploader.upload(file.path, {
-      folder: "profile_pictures",
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        {
+          folder: "profile_pictures",
+          public_id: `user-${user.id}-${Date.now()}`,
+        },
+        (error, result) => {
+          error ? reject(error) : resolve(result);
+        }
+      );
+
+      stream.end(file.buffer);
     });
 
     user.profilePic = {
@@ -615,6 +627,48 @@ class UserService {
     return {
       statusCode: 200,
       message: "Account successfully deleted!",
+    };
+  }
+
+  static async deleteProfilePicByUserId({ id }) {
+    if (!id) {
+      return {
+        statusCode: 404,
+        message: "Provide the user id to delete the image",
+      };
+    }
+
+    HelperFunction.IdValidation(id);
+
+    const user = await UserModel.findById(id);
+
+    if (!user) {
+      return {
+        statusCode: 404,
+        message: "User with the provided ID does not exist",
+      };
+    }
+
+    if (user.profilePic?.publicId) {
+      await cloudinary.uploader.destroy(user.profilePic.publicId);
+    } else {
+      return {
+        statusCode: 404,
+        message: "No profile picture found to delete",
+      };
+    }
+
+    user.profilePic = {
+      url: "",
+      publicId: "",
+    };
+
+    await user.save();
+
+    return {
+      statusCode: 200,
+      message: "Profile picture deleted successfully",
+      data: user.profilePic,
     };
   }
 }
