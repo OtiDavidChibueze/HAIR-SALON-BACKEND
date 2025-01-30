@@ -1,5 +1,5 @@
-import cloudinary from "cloudinary";
-cloudinary.v2;
+import pkg from "cloudinary";
+const { v2: cloudinary } = pkg;
 
 import {
   PRODUCTION_CLOUDINARY_NAME,
