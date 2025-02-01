@@ -102,4 +102,19 @@ route.get(
   RBAC_Auth("SuperAdmin"),
   UserController.usersTotalCounts
 );
+// route.get("/users/search", JwtAuth, UserController.searchUsers);
+
+route.get(
+  "/users/isVerified",
+  JwtAuth,
+  RBAC_Auth("SuperAdmin"),
+  UserController.isVerified
+);
+route.get(
+  "/users/unVerified",
+  JwtAuth,
+  RBAC_Auth("SuperAdmin"),
+  UserController.unVerified
+);
+
 export default route;

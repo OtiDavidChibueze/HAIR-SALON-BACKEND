@@ -962,6 +962,97 @@ class UserService {
       data: allUsers,
     };
   }
+
+  // static async searchUsers({ name, role, page = 1, limit = 10 }) {
+  //   if (!name && !role)
+  //     return {
+  //       statusCode: 404,
+  //       message: "Provide name or role to proceed with search",
+  //     };
+
+  //   const newQuery = {};
+
+  //   name ? (newQuery.name = { $regex: name, $options: "i" }) : null;
+  //   role ? (newQuery.name = { $regex: role, $options: "i" }) : null;
+
+  //   const options = {
+  //     page: parseInt(page || 10),
+  //     limit: parseInt(limit || 10),
+  //     sort: { name: 1 },
+  //     select: "-password",
+  //   };
+
+  //   const search = await UserModel.paginate(newQuery, options);
+
+  //   if (!search.doc.length)
+  //     return {
+  //       statusCode: 404,
+  //       message: "No users match the provided search criteria.",
+  //     };
+
+  //   return {
+  //     statusCode: 200,
+  //     message: "Search results retrieved successfully.",
+  //     data: {
+  //       users: search.docs,
+  //       total: search.totalDocs,
+  //       totalPages: search.totalPages,
+  //       currentPage: search.page,
+  //       hasNextPage: search.hasNextPage,
+  //       hasPrevPage: search.hasPrevPage,
+  //     },
+  //   };
+  // }
+
+  static async isVerified() {
+    const users = await UserModel.find(
+      { isVerified: true },
+      { password: 0 }
+    ).sort({
+      name: 1,
+      createdAt: 1,
+    });
+
+    if (users.length === 0)
+      return {
+        statusCode: 404,
+        message: [{ message: "No verified users found", count: users.length }],
+      };
+
+    const count = users.length;
+
+    return {
+      statusCode: 200,
+      message: "verified users fetched successfully",
+      data: { users, count },
+    };
+  }
+
+  static async unVerified() {
+    const users = await UserModel.find(
+      { isVerified: false },
+      { password: 0 }
+    ).sort({
+      name: 1,
+      createdAt: 1,
+    });
+
+    if (users.length === 0)
+      return {
+        statusCode: 404,
+        message: [
+          { message: "No unVerified users found", count: users.length },
+        ],
+      };
+
+    const count = users.length;
+
+    return {
+      statusCode: 200,
+      message: "Unverified users fetched successfully",
+      data: { users, count },
+    };
+  }
 }
 
 export default UserService;

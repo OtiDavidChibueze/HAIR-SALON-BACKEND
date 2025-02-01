@@ -405,7 +405,7 @@ class UserController {
     try {
       const result = await UserService.users();
 
-      if (result.statusCode === 404 || result.statusCode === 406)
+      if (result.statusCode === 404)
         return ResponseHelper.errorResponse(
           res,
           result.statusCode,
@@ -430,7 +430,7 @@ class UserController {
     try {
       const result = await UserService.admins();
 
-      if (result.statusCode === 404 || result.statusCode === 406)
+      if (result.statusCode === 404)
         return ResponseHelper.errorResponse(
           res,
           result.statusCode,
@@ -455,7 +455,7 @@ class UserController {
     try {
       const result = await UserService.superAdmins();
 
-      if (result.statusCode === 404 || result.statusCode === 406)
+      if (result.statusCode === 404)
         return ResponseHelper.errorResponse(
           res,
           result.statusCode,
@@ -480,13 +480,6 @@ class UserController {
     try {
       const result = await UserService.usersTotalCounts();
 
-      if (result.statusCode === 404 || result.statusCode === 406)
-        return ResponseHelper.errorResponse(
-          res,
-          result.statusCode,
-          result.message
-        );
-
       Logger.info(`usersTotalCountsController: ${JSON.stringify(result.data)}`);
 
       return ResponseHelper.successResponse(
@@ -497,6 +490,81 @@ class UserController {
       );
     } catch (err) {
       Logger.error("usersTotalCountsController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
+
+  // static async searchUsers(req, res) {
+  //   try {
+  //     const result = await UserService.searchUsers(req.query);
+
+  //     if (result.statusCode === 404)
+  //       return ResponseHelper.errorResponse(
+  //         res,
+  //         result.statusCode,
+  //         result.message
+  //       );
+
+  //     Logger.info(`searchUsersController: ${JSON.stringify(result.data)}`);
+
+  //     return ResponseHelper.successResponse(
+  //       res,
+  //       result.statusCode,
+  //       result.message,
+  //       result.data
+  //     );
+  //   } catch (err) {
+  //     Logger.error("searchUsersController Error:", err);
+  //     return ResponseHelper.errorResponse(res, 500, "internal server error ");
+  //   }
+  // }
+
+  static async isVerified(req, res) {
+    try {
+      const result = await UserService.isVerified();
+
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`isVerifiedController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("isVerifiedController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
+
+  static async unVerified(req, res) {
+    try {
+      const result = await UserService.unVerified();
+
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`unVerifiedController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("unVerifiedController Error:", err);
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }
