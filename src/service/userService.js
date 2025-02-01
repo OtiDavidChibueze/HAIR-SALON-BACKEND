@@ -889,7 +889,7 @@ class UserService {
     if (users.length === 0)
       return {
         statusCode: 404,
-        message: [{ message: "No users found", count: 0 }],
+        message: [{ message: "No users found", count: users.length }],
       };
 
     const count = users.length;
@@ -913,7 +913,7 @@ class UserService {
     if (admins.length === 0)
       return {
         statusCode: 404,
-        message: [{ message: "No admins found", count: 0 }],
+        message: [{ message: "No admins found", count: admins.length }],
       };
 
     const count = admins.length;
@@ -937,7 +937,9 @@ class UserService {
     if (superAdmins.length === 0)
       return {
         statusCode: 404,
-        message: [{ message: "No superAdmins found", count: 0 }],
+        message: [
+          { message: "No superAdmins found", count: superAdmins.length },
+        ],
       };
 
     const count = superAdmins.length;
