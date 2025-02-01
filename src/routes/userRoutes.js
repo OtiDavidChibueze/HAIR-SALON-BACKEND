@@ -102,8 +102,7 @@ route.get(
   RBAC_Auth("SuperAdmin"),
   UserController.usersTotalCounts
 );
-// route.get("/users/search", JwtAuth, UserController.searchUsers);
-
+route.get("/users/search", JwtAuth, UserController.searchUsers);
 route.get(
   "/users/isVerified",
   JwtAuth,

@@ -494,30 +494,30 @@ class UserController {
     }
   }
 
-  // static async searchUsers(req, res) {
-  //   try {
-  //     const result = await UserService.searchUsers(req.query);
+  static async searchUsers(req, res) {
+    try {
+      const result = await UserService.searchUsers(req.query);
 
-  //     if (result.statusCode === 404)
-  //       return ResponseHelper.errorResponse(
-  //         res,
-  //         result.statusCode,
-  //         result.message
-  //       );
+      if (result.statusCode === 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
 
-  //     Logger.info(`searchUsersController: ${JSON.stringify(result.data)}`);
+      Logger.info(`searchUsersController: ${JSON.stringify(result.data)}`);
 
-  //     return ResponseHelper.successResponse(
-  //       res,
-  //       result.statusCode,
-  //       result.message,
-  //       result.data
-  //     );
-  //   } catch (err) {
-  //     Logger.error("searchUsersController Error:", err);
-  //     return ResponseHelper.errorResponse(res, 500, "internal server error ");
-  //   }
-  // }
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("searchUsersController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
 
   static async isVerified(req, res) {
     try {

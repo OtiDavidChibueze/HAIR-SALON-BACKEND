@@ -963,46 +963,50 @@ class UserService {
     };
   }
 
-  // static async searchUsers({ name, role, page = 1, limit = 10 }) {
-  //   if (!name && !role)
-  //     return {
-  //       statusCode: 404,
-  //       message: "Provide name or role to proceed with search",
-  //     };
+  static async searchUsers({ name, role, page = 1, limit = 10 }) {
+    if (!name && !role)
+      return {
+        statusCode: 404,
+        message: "Provide name or role to proceed with search",
+      };
 
-  //   const newQuery = {};
+    const newQuery = {};
 
-  //   name ? (newQuery.name = { $regex: name, $options: "i" }) : null;
-  //   role ? (newQuery.name = { $regex: role, $options: "i" }) : null;
+    name ? (newQuery.name = { $regex: name, $options: "i" }) : null;
+    role ? (newQuery.name = { $regex: role, $options: "i" }) : null;
 
-  //   const options = {
-  //     page: parseInt(page || 10),
-  //     limit: parseInt(limit || 10),
-  //     sort: { name: 1 },
-  //     select: "-password",
-  //   };
+    const options = {
+      page: parseInt(page || 10),
+      limit: parseInt(limit || 10),
+      sort: { name: 1 },
+      select: "-password",
+    };
 
-  //   const search = await UserModel.paginate(newQuery, options);
+    const search = await UserModel.paginate(newQuery, options);
 
-  //   if (!search.doc.length)
-  //     return {
-  //       statusCode: 404,
-  //       message: "No users match the provided search criteria.",
-  //     };
+    if (!search.docs.length)
+      return {
+        statusCode: 404,
+        message: "No users match the provided search criteria.",
+      };
 
-  //   return {
-  //     statusCode: 200,
-  //     message: "Search results retrieved successfully.",
-  //     data: {
-  //       users: search.docs,
-  //       total: search.totalDocs,
-  //       totalPages: search.totalPages,
-  //       currentPage: search.page,
-  //       hasNextPage: search.hasNextPage,
-  //       hasPrevPage: search.hasPrevPage,
-  //     },
-  //   };
-  // }
+    return {
+      statusCode: 200,
+      message: "Search results retrieved successfully.",
+      data: {
+        users: search.docs,
+        totalDocs: search.totalDocs,
+        limit: search.limit,
+        totalPages: search.totalPages,
+        page: search.page,
+        pagingCounter: search.pagingCounter,
+        hasPrevPage: search.hasPrevPage,
+        hasNextPage: search.hasNextPage,
+        prevPage: search.prevPage,
+        nextPage: search.nextPage,
+      },
+    };
+  }
 
   static async isVerified() {
     const users = await UserModel.find(
