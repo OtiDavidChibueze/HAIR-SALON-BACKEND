@@ -32,7 +32,7 @@ class UserController {
     }
   }
 
-  static async createUser(req, res) {
+  static async signIn(req, res) {
     try {
       const result = await UserService.signIn(req.body);
 
@@ -372,6 +372,31 @@ class UserController {
       );
     } catch (err) {
       Logger.error("deleteUserByIdController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
+
+  static async editAccount(req, res) {
+    try {
+      const result = await UserService.editAccount(req, req.user);
+
+      if (result.statusCode === 404 || result.statusCode === 406)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`editAccountController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("editAccountController Error:", err);
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }

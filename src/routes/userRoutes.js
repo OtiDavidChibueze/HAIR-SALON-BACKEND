@@ -9,6 +9,7 @@ import {
   forgottenPassword,
   login,
   resetPassword,
+  updateUser,
 } from "../validation/schema/userSchemaValidation.js";
 import { loginLimiter } from "../config/rateLimit.js";
 import { uploadProfilePic } from "../middleware/upload.js";
@@ -61,6 +62,12 @@ route.delete(
   JwtAuth,
   RBAC_Auth("Admin", "SuperAdmin"),
   UserController.deleteAccountById
+);
+route.put(
+  "/update-profile",
+  JwtAuth,
+  SchemaValidationHelper.validateInput(updateUser),
+  UserController.editAccount
 );
 
 export default route;

@@ -133,7 +133,9 @@ class UserService {
         message: "This account has been blocked!",
       };
 
-    const userExists = await UserModel.findOne({ email: data.email });
+    const userExists = await UserModel.findOne({
+      $or: [{ email: data.email }, { phone: data.phone }],
+    });
 
     if (userExists)
       return {
@@ -807,6 +809,69 @@ class UserService {
       statusCode: 200,
       message: "Account has been permantly deleted",
       data: user.email,
+    };
+  }
+
+  static async editAccount({ body }, { id }) {
+    if (!body || Object.keys(body).length === 0)
+      return {
+        statusCode: 404,
+        message: "Provide inputs to proceed with account edit ",
+      };
+
+    HelperFunction.IdValidation(id);
+
+    console.log("id", id);
+
+    const user = await UserModel.findById(id);
+
+    if (!user)
+      return {
+        statusCode: 404,
+        message: "User does not exist",
+      };
+
+    if (user.id !== id)
+      return {
+        statusCode: 404,
+        message: "Sorry! you can't proceed with this request",
+      };
+
+    if (body.email && body.email !== user.email) {
+      const isDupulicate = await UserModel.findOne({ email: body.email });
+
+      if (isDupulicate)
+        return {
+          statusCode: 406,
+          message: "Provided email has already been taken!!!",
+        };
+
+      user.email = body.email;
+      user.isVerified = !user.isVerified;
+    }
+
+    if (body.phone && body.phone !== user.phone) {
+      const isDupulicate = await UserModel.findOne({ phone: body.phone });
+
+      if (isDupulicate)
+        return {
+          statusCode: 406,
+          message: "Provided phone number has already been taken!!!",
+        };
+
+      user.phone = body.phone;
+    }
+
+    Object.keys(body).forEach((key) => {
+      key !== "email" && key !== "phone" ? (user[key] = body[key]) : null;
+    });
+
+    const updateUser = await user.save();
+
+    return {
+      statusCode: 200,
+      message: "User updated successfully",
+      data: updateUser,
     };
   }
 }
