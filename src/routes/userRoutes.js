@@ -26,7 +26,7 @@ route.post(
   UserController.signIn
 );
 route.post(
-  "/upload-profile-pic",
+  "/user/upload-profile-pic",
   JwtAuth,
   uploadProfilePic.single("image"),
   UserController.uploadProfilePic
@@ -45,12 +45,20 @@ route.get(
   SchemaValidationHelper.validateInput(forgottenPassword),
   UserController.forgottenPassword
 );
-route.get("/profile", JwtAuth, UserController.profile);
-route.get("/logOut", JwtAuth, UserController.logOut);
-route.get("/refresh", JwtAuth, UserController.refreshToken);
+route.get("/user/profile", JwtAuth, UserController.profile);
+route.get("/user/logOut", JwtAuth, UserController.logOut);
+route.get("/user/refresh", JwtAuth, UserController.refreshToken);
 
-route.delete("/delete-profile-pic", JwtAuth, UserController.deleteProfilePic);
-route.delete("/delete-your-account", JwtAuth, UserController.deleteYourAccount);
+route.delete(
+  "/user/delete-profile-pic",
+  JwtAuth,
+  UserController.deleteProfilePic
+);
+route.delete(
+  "/user/delete-your-account",
+  JwtAuth,
+  UserController.deleteYourAccount
+);
 route.delete(
   "/delete-profile-pic/:id",
   JwtAuth,
@@ -58,16 +66,35 @@ route.delete(
   UserController.deleteProfilePicByUserId
 );
 route.delete(
-  "/delete-account/:id",
+  "/user/delete-account/:id",
   JwtAuth,
   RBAC_Auth("Admin", "SuperAdmin"),
   UserController.deleteAccountById
 );
 route.put(
-  "/update-profile",
+  "/user/update-profile",
   JwtAuth,
   SchemaValidationHelper.validateInput(updateUser),
   UserController.editAccount
+);
+
+route.get(
+  "/users",
+  JwtAuth,
+  RBAC_Auth("Admin", "SuperAdmin"),
+  UserController.users
+);
+route.get(
+  "/admins",
+  JwtAuth,
+  RBAC_Auth("Admin", "SuperAdmin"),
+  UserController.admins
+);
+route.get(
+  "/superAdmins",
+  JwtAuth,
+  RBAC_Auth("Admin", "SuperAdmin"),
+  UserController.superAdmins
 );
 
 export default route;

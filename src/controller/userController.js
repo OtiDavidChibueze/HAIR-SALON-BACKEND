@@ -400,6 +400,81 @@ class UserController {
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }
+
+  static async users(req, res) {
+    try {
+      const result = await UserService.users(req, req.user);
+
+      if (result.statusCode === 404 || result.statusCode === 406)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`usersController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("usersController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
+
+  static async admins(req, res) {
+    try {
+      const result = await UserService.admins(req, req.user);
+
+      if (result.statusCode === 404 || result.statusCode === 406)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`adminsController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("adminsController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
+
+  static async superAdmins(req, res) {
+    try {
+      const result = await UserService.superAdmins(req, req.user);
+
+      if (result.statusCode === 404 || result.statusCode === 406)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`superdminsController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("superdminsController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
 }
 
 export default UserController;

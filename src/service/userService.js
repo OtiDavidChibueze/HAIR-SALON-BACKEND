@@ -108,7 +108,12 @@ class UserService {
     return {
       statusCode: 200,
       message: "log in successful",
-      data: { user: getUser.name, refreshToken, accessToken },
+      data: {
+        user: getUser.name,
+        role: getUser.role,
+        refreshToken,
+        accessToken,
+      },
     };
   }
 
@@ -872,6 +877,75 @@ class UserService {
       statusCode: 200,
       message: "User updated successfully",
       data: updateUser,
+    };
+  }
+
+  static async users() {
+    const users = await UserModel.find({ role: "User" }, { password: 0 }).sort({
+      name: 1,
+      createdAt: 1,
+    });
+
+    if (users.length === 0)
+      return {
+        statusCode: 404,
+        message: [{ message: "No users found", count: 0 }],
+      };
+
+    const count = users.length;
+
+    return {
+      statusCode: 200,
+      message: "Users fetched successfully",
+      data: { users, count },
+    };
+  }
+
+  static async admins() {
+    const admins = await UserModel.find(
+      { role: "Admin" },
+      { password: 0 }
+    ).sort({
+      name: 1,
+      createdAt: 1,
+    });
+
+    if (admins.length === 0)
+      return {
+        statusCode: 404,
+        message: [{ message: "No admins found", count: 0 }],
+      };
+
+    const count = admins.length;
+
+    return {
+      statusCode: 200,
+      message: "admins fetched successfully",
+      data: { admins, count },
+    };
+  }
+
+  static async superAdmins() {
+    const superAdmins = await UserModel.find(
+      { role: "SuperAdmin" },
+      { password: 0 }
+    ).sort({
+      name: 1,
+      createdAt: 1,
+    });
+
+    if (superAdmins.length === 0)
+      return {
+        statusCode: 404,
+        message: [{ message: "No superAdmins found", count: 0 }],
+      };
+
+    const count = superAdmins.length;
+
+    return {
+      statusCode: 200,
+      message: "superAdmins fetched successfully",
+      data: { superAdmins, count },
     };
   }
 }
