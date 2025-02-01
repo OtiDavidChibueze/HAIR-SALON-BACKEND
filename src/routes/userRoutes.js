@@ -96,5 +96,10 @@ route.get(
   RBAC_Auth("Admin", "SuperAdmin"),
   UserController.superAdmins
 );
-
+route.get(
+  "/users/totalCounts",
+  JwtAuth,
+  RBAC_Auth("SuperAdmin"),
+  UserController.usersTotalCounts
+);
 export default route;

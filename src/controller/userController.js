@@ -403,7 +403,7 @@ class UserController {
 
   static async users(req, res) {
     try {
-      const result = await UserService.users(req, req.user);
+      const result = await UserService.users();
 
       if (result.statusCode === 404 || result.statusCode === 406)
         return ResponseHelper.errorResponse(
@@ -428,7 +428,7 @@ class UserController {
 
   static async admins(req, res) {
     try {
-      const result = await UserService.admins(req, req.user);
+      const result = await UserService.admins();
 
       if (result.statusCode === 404 || result.statusCode === 406)
         return ResponseHelper.errorResponse(
@@ -453,7 +453,7 @@ class UserController {
 
   static async superAdmins(req, res) {
     try {
-      const result = await UserService.superAdmins(req, req.user);
+      const result = await UserService.superAdmins();
 
       if (result.statusCode === 404 || result.statusCode === 406)
         return ResponseHelper.errorResponse(
@@ -472,6 +472,31 @@ class UserController {
       );
     } catch (err) {
       Logger.error("superdminsController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "internal server error ");
+    }
+  }
+
+  static async usersTotalCounts(req, res) {
+    try {
+      const result = await UserService.usersTotalCounts();
+
+      if (result.statusCode === 404 || result.statusCode === 406)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(`usersTotalCountsController: ${JSON.stringify(result.data)}`);
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("usersTotalCountsController Error:", err);
       return ResponseHelper.errorResponse(res, 500, "internal server error ");
     }
   }

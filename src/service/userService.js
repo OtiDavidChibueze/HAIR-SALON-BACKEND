@@ -118,7 +118,7 @@ class UserService {
   }
 
   static async signIn(data) {
-    if (!data)
+    if (!data || Object.keys(data).length === 0)
       return {
         statusCode: 422,
         message: "Provide inputs for fields",
@@ -127,7 +127,9 @@ class UserService {
     let userAlreadyBlocked;
 
     try {
-      userAlreadyBlocked = await redisClient.get(`blockedAccount:${email}`);
+      userAlreadyBlocked = await redisClient.get(
+        `blockedAccount:${data.email}`
+      );
     } catch (err) {
       Logger.error("Redis Error:", err);
     }
@@ -948,6 +950,16 @@ class UserService {
       statusCode: 200,
       message: "superAdmins fetched successfully",
       data: { superAdmins, count },
+    };
+  }
+
+  static async usersTotalCounts() {
+    const allUsers = await UserModel.countDocuments();
+
+    return {
+      statusCode: 200,
+      message: "total Users Count fetched",
+      data: allUsers,
     };
   }
 }
