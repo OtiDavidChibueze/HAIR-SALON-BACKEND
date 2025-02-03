@@ -8,6 +8,7 @@ import mongoose from "mongoose";
 import helmet from "helmet";
 import cookieParser from "cookie-parser";
 import UserRoutes from "./src/routes/userRoutes.js";
+import AppointmentRoutes from "./src/routes/appointmentRoutes.js";
 
 app.use(express.json());
 app.use(cors());
@@ -36,4 +37,5 @@ const connectDB = async () => {
 
 connectDB();
 
-app.use("/api/v1/user", UserRoutes);
+app.use("/api/v1/hair-salon", UserRoutes);
+app.use("/api/v1/hair-salon", AppointmentRoutes);
