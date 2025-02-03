@@ -20,13 +20,6 @@ const userSchema = new mongoose.Schema(
       country: { type: String },
     },
 
-    appointments: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Appointment",
-      },
-    ],
-
     profilePic: {
       url: { type: String, default: "" },
       publicId: { type: String, default: "" },
