@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
     phone: { type: String, unique: true, required: true },
     role: {
       type: String,
-      enum: ["User", "Admin", "SuperAdmin"],
+      enum: ["User", "Hairstylist", "Admin"],
       default: "User",
     },
     address: {
@@ -19,17 +19,14 @@ const userSchema = new mongoose.Schema(
       postalCode: { type: String },
       country: { type: String },
     },
-    location: {
-      type: {
-        type: String,
-        enum: ["Point"],
-        default: "Point",
+
+    appointments: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Appointment",
       },
-      coordinates: {
-        type: [Number], // [longitude, latitude]
-        index: "2dsphere",
-      },
-    },
+    ],
+
     profilePic: {
       url: { type: String, default: "" },
       publicId: { type: String, default: "" },
