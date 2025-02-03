@@ -1,42 +1,64 @@
 import Joi from "joi";
+import mongoose from "mongoose";
 
-// Custom validation for MongoDB ObjectId
-const objectId = Joi.string()
-  .pattern(/^[0-9a-fA-F]{24}$/)
-  .message("Invalid ObjectId format");
+// Joi validation schema
+const appointmentSchema = Joi.object({
+  customer: Joi.string().custom((value, helpers) => {
+    if (!mongoose.Types.ObjectId.isValid(value)) {
+      return helpers.error("any.invalid");
+    }
+    return value;
+  }, "MongoDB ObjectId validation"),
 
-const appointmentValidationSchema = Joi.object({
-  customer: objectId.required().messages({
-    "any.required": "Customer is required",
-    "string.pattern.base": "Customer must be a valid ObjectId",
-  }),
-  hairstylist: objectId.required().messages({
-    "any.required": "Hairstylist is required",
-    "string.pattern.base": "Hairstylist must be a valid ObjectId",
-  }),
-  service: objectId.required().messages({
-    "any.required": "Service is required",
-    "string.pattern.base": "Service must be a valid ObjectId",
-  }),
-  date: Joi.date().iso().greater("now").required().messages({
-    "any.required": "Date is required",
-    "date.base": "Date must be a valid ISO date",
-    "date.greater": "Date must be in the future",
-  }),
+  hairstylist: Joi.string()
+    .custom((value, helpers) => {
+      if (!mongoose.Types.ObjectId.isValid(value)) {
+        return helpers.error("any.invalid");
+      }
+      return value;
+    }, "MongoDB ObjectId validation")
+    .required(),
+
+  service: Joi.string().min(3).max(100).required(),
+
+  date: Joi.date()
+    .greater("now") // Ensures the date is in the future
+    .required(),
+
   timeSlot: Joi.string()
-    .pattern(/^([01]?[0-9]|2[0-3]):[0-5][0-9]$/)
-    .required()
-    .messages({
-      "any.required": "Time slot is required",
-      "string.pattern.base": "Time slot must be in HH:mm format (24-hour)",
-    }),
+    .pattern(
+      /^([0-9]{1,2}):([0-9]{2})\s?(AM|PM)\s?-\s?([0-9]{1,2}):([0-9]{2})\s?(AM|PM)$/
+    )
+    .required(),
+
   status: Joi.string()
     .valid("booked", "rescheduled", "canceled", "completed")
-    .default("booked")
-    .messages({
-      "any.only":
-        "Status must be one of 'booked', 'rescheduled', 'canceled', or 'completed'",
+    .default("booked"),
+
+  address: Joi.object({
+    street: Joi.string().required().messages({
+      "string.empty": "Street is required",
     }),
+    city: Joi.string().required().messages({
+      "string.empty": "City is required",
+    }),
+    state: Joi.string().required().messages({
+      "string.empty": "State is required",
+    }),
+    postalCode: Joi.string()
+      .pattern(/^[0-9]{5}(-[0-9]{4})?$/)
+      .min(5)
+      .max(9)
+      .required()
+      .messages({
+        "string.empty": "Postal Code is required",
+        "string.pattern.base":
+          "Postal Code must be a valid format (e.g., 12345 or 12345-6789)",
+      }),
+    country: Joi.string().required().messages({
+      "string.empty": "Country is required",
+    }),
+  }),
 });
 
-export { appointmentValidationSchema };
+export { appointmentSchema };
