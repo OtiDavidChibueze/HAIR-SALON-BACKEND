@@ -104,39 +104,7 @@ const createUser = Joi.object({
   isVerified: Joi.boolean().default(false).messages({
     "boolean.base": "Is verified must be a boolean.",
   }),
-
-  location: Joi.object({
-    type: Joi.string().valid("Point").required().messages({
-      "string.base": "Location type must be a string.",
-      "string.empty": "Location type is required.",
-      "any.only": 'Location type must be "Point".',
-    }),
-    coordinates: Joi.array()
-      .items(
-        Joi.number().required().messages({
-          "number.base": "Coordinates must contain numbers.",
-          "any.required": "Coordinate values are required.",
-        })
-      )
-      .length(2)
-      .required()
-      .custom((value, helpers) => {
-        const [longitude, latitude] = value;
-        if (longitude < -180 || longitude > 180) {
-          return helpers.message("Longitude must be between -180 and 180.");
-        }
-        if (latitude < -90 || latitude > 90) {
-          return helpers.message("Latitude must be between -90 and 90.");
-        }
-        return value;
-      })
-      .messages({
-        "array.base": "Coordinates must be an array of numbers.",
-        "array.length":
-          "Coordinates must contain exactly two values: [longitude, latitude].",
-      }),
-  }),
-}).unknown(true); // Allows unknown properties (like timestamps) to pass through
+}).unknown(false); // Allows unknown properties (like timestamps) to pass through
 
 const login = Joi.object({
   email: Joi.string()
@@ -284,38 +252,6 @@ const updateUser = Joi.object({
       "boolean.base": "Is verified must be a boolean.",
     })
     .optional(),
-
-  location: Joi.object({
-    type: Joi.string().valid("Point").required().messages({
-      "string.base": "Location type must be a string.",
-      "string.empty": "Location type is required.",
-      "any.only": 'Location type must be "Point".',
-    }),
-    coordinates: Joi.array()
-      .items(
-        Joi.number().required().messages({
-          "number.base": "Coordinates must contain numbers.",
-          "any.required": "Coordinate values are required.",
-        })
-      )
-      .length(2)
-      .required()
-      .custom((value, helpers) => {
-        const [longitude, latitude] = value;
-        if (longitude < -180 || longitude > 180) {
-          return helpers.message("Longitude must be between -180 and 180.");
-        }
-        if (latitude < -90 || latitude > 90) {
-          return helpers.message("Latitude must be between -90 and 90.");
-        }
-        return value;
-      })
-      .messages({
-        "array.base": "Coordinates must be an array of numbers.",
-        "array.length":
-          "Coordinates must contain exactly two values: [longitude, latitude].",
-      }),
-  }),
 }).unknown(false);
 
 export { createUser, updateUser, login, forgottenPassword, resetPassword };
