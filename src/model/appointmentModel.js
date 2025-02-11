@@ -19,13 +19,6 @@ const appointmentSchema = new mongoose.Schema(
       enum: ["booked", "rescheduled", "canceled", "completed"],
       default: "booked",
     },
-    address: {
-      street: { type: String },
-      city: { type: String },
-      state: { type: String },
-      postalCode: { type: String },
-      country: { type: String },
-    },
   },
   { timestamps: true }
 );
