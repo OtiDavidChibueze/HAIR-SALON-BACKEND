@@ -121,7 +121,7 @@ class AppointmentService {
     };
   }
 
-  static async appointments({ id }) {
+  static async HairStylistAppointments({ id }) {
     if (!id)
       return {
         statusCode: 404,
@@ -138,12 +138,114 @@ class AppointmentService {
         message: "User does not exist",
       };
 
-    const getAppointments = await AppointmentModel.find({ customer: id });
+    const getAppointment = await AppointmentModel.find({
+      customer: id,
+    }).populate("customer");
 
     return {
       statusCode: 200,
       message: "Appointments fetched successfully",
       data: { appointments: getAppointments },
+    };
+  }
+
+  static async appointments() {
+    const getAppointments = await AppointmentModel.find();
+
+    if (!getAppointments)
+      return {
+        statusCode: 404,
+        message: "No appointments found!",
+      };
+
+    return {
+      statusCode: 200,
+      message: "Appointments fetched successfully",
+      data: { appointments: getAppointments },
+    };
+  }
+
+  static async getAppointmentById({ id }) {
+    if (!id)
+      return {
+        statusCode: 404,
+        message: "Please provide appointment ID",
+      };
+
+    console.log(id);
+
+    HelperFunction.IdValidation(id);
+
+    const getAppointment = await AppointmentModel.find({ _id: id });
+
+    console.log(getAppointment);
+
+    if (!getAppointment)
+      return {
+        statusCode: 404,
+        message: "No appointments found!",
+      };
+
+    return {
+      statusCode: 200,
+      message: "Appointments fetched successfully",
+      data: getAppointment,
+    };
+  }
+
+  static async editAppointmentById({ status }, { id }) {
+    if (!status && !id)
+      return {
+        statusCode: 404,
+        message: "provide input field",
+      };
+
+    HelperFunction.IdValidation(id);
+
+    const appointment = await AppointmentModel.findById({ _id: id });
+
+    if (!appointment)
+      return {
+        statusCode: 404,
+        message: "appointment with the provided ID not found",
+      };
+
+    appointment.status = status || appointment.status;
+
+    const updateAppointment = await appointment.save();
+
+    return {
+      statusCode: 200,
+      message: "appointment has been updated successfully",
+      data: updateAppointment,
+    };
+  }
+
+  static async deleteAppointmentById({ id }) {
+    if (!id)
+      return {
+        statusCode: 404,
+        message: "provide input for id",
+      };
+
+    HelperFunction.IdValidation(id);
+
+    const appointment = await AppointmentModel.findById({ _id: id });
+
+    if (!appointment)
+      return {
+        statusCode: 404,
+        message: "appointment with the provided ID not found",
+      };
+
+    const deleteAppointment = await AppointmentModel.findByIdAndDelete({
+      _id: id,
+    });
+
+    return {
+      statusCode: 200,
+      message: "appointment has been deleted successfully",
+      data: deleteAppointment,
     };
   }
 }

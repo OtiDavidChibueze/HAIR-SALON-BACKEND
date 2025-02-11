@@ -31,9 +31,37 @@ class AppointmentController {
     }
   }
 
+  static async HairStylistAppointments(req, res) {
+    try {
+      const result = await AppointmentService.HairStylistAppointments(req.user);
+
+      if (result.statusCode == 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(
+        "HairStylistAppointmentsController ->:",
+        JSON.stringify(result.data)
+      );
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("HairStylistAppointmentsController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
+
   static async appointments(req, res) {
     try {
-      const result = await AppointmentService.appointments(req.user);
+      const result = await AppointmentService.appointments();
 
       if (result.statusCode == 404)
         return ResponseHelper.errorResponse(
@@ -52,6 +80,93 @@ class AppointmentController {
       );
     } catch (err) {
       Logger.error("appointmentsController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
+
+  static async getAppointmentById(req, res) {
+    try {
+      const result = await AppointmentService.getAppointmentById(req.params);
+
+      if (result.statusCode == 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(
+        "getAppointmentByIdController ->:",
+        JSON.stringify(result.data)
+      );
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("getAppointmentByIdController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
+
+  static async editAppointmentById(req, res) {
+    try {
+      const result = await AppointmentService.editAppointmentById(
+        req.body,
+        req.params
+      );
+
+      if (result.statusCode == 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(
+        "editAppointmentByIdController ->:",
+        JSON.stringify(result.data)
+      );
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("editAppointmentByIdController Error:", err);
+      return ResponseHelper.errorResponse(res, 500, "Internal server error");
+    }
+  }
+
+  static async deleteAppointmentById(req, res) {
+    try {
+      const result = await AppointmentService.deleteAppointmentById(req.params);
+
+      if (result.statusCode == 404)
+        return ResponseHelper.errorResponse(
+          res,
+          result.statusCode,
+          result.message
+        );
+
+      Logger.info(
+        "deleteAppointmentByIdController ->:",
+        JSON.stringify(result.data)
+      );
+
+      return ResponseHelper.successResponse(
+        res,
+        result.statusCode,
+        result.message,
+        result.data
+      );
+    } catch (err) {
+      Logger.error("deleteAppointmentByIdController Error:", err);
       return ResponseHelper.errorResponse(res, 500, "Internal server error");
     }
   }
