@@ -2,7 +2,7 @@ import Joi from "joi";
 import mongoose from "mongoose";
 
 // Joi validation schema
-const appointmentSchema = Joi.object({
+const createAppointment = Joi.object({
   customer: Joi.string().custom((value, helpers) => {
     if (!mongoose.Types.ObjectId.isValid(value)) {
       return helpers.error("any.invalid");
@@ -34,31 +34,10 @@ const appointmentSchema = Joi.object({
   status: Joi.string()
     .valid("booked", "rescheduled", "canceled", "completed")
     .default("booked"),
+}).unknown(true);
 
-  address: Joi.object({
-    street: Joi.string().required().messages({
-      "string.empty": "Street is required",
-    }),
-    city: Joi.string().required().messages({
-      "string.empty": "City is required",
-    }),
-    state: Joi.string().required().messages({
-      "string.empty": "State is required",
-    }),
-    postalCode: Joi.string()
-      .pattern(/^[0-9]{5}(-[0-9]{4})?$/)
-      .min(5)
-      .max(9)
-      .required()
-      .messages({
-        "string.empty": "Postal Code is required",
-        "string.pattern.base":
-          "Postal Code must be a valid format (e.g., 12345 or 12345-6789)",
-      }),
-    country: Joi.string().required().messages({
-      "string.empty": "Country is required",
-    }),
-  }),
-});
+const editAppointment = Joi.object({
+  status: Joi.string().valid("booked", "rescheduled", "canceled", "completed"),
+}).unknown(true);
 
-export { appointmentSchema };
+export { createAppointment, editAppointment };
