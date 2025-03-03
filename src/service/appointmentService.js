@@ -145,7 +145,7 @@ class AppointmentService {
     return {
       statusCode: 200,
       message: "Appointments fetched successfully",
-      data: { appointments: getAppointments },
+      data: { appointments: getAppointment },
     };
   }
 
